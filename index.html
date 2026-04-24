@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Pipeline — Warrior Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0f;
+    --surface: #141618;
+    --surface2: #1c1f22;
+    --border: #2a2d31;
+    --border2: #363a40;
+    --accent: #c8f135;
+    --accent2: #7fff6a;
+    --text: #e8eaed;
+    --text2: #9aa0aa;
+    --text3: #5c6370;
+    --danger: #ff5f5f;
+    --warn: #ffb347;
+    --info: #5bc4ff;
+    --purple: #b57bff;
+    --pink: #ff7bdb;
+
+    --status-research: #5bc4ff;
+    --status-scripting: #ffb347;
+    --status-recorded: #b57bff;
+    --status-editor: #ff7bdb;
+    --status-edited: #ff5f5f;
+    --status-uploaded: #c8f135;
+    --status-reviewed: #7fff6a;
+  }
+
+  /* ── LIGHT MODE ── */
+  body.light {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #eef0f3;
+    --border: #dde0e6;
+    --border2: #c8ccd4;
+    --accent: #5a9e00;
+    --accent2: #3d7a00;
+    --text: #1a1d21;
+    --text2: #4a5260;
+    --text3: #9aa0aa;
+    --danger: #d93636;
+    --warn: #c47a00;
+    --info: #0070a8;
+    --purple: #7c3aed;
+    --pink: #c026a8;
+
+    --status-research: #0070a8;
+    --status-scripting: #c47a00;
+    --status-recorded: #7c3aed;
+    --status-editor: #c026a8;
+    --status-edited: #d93636;
+    --status-uploaded: #5a9e00;
+    --status-reviewed: #2d8a00;
+  }
+
+  body.light .logo-icon { color: #fff; background: var(--accent); }
+  body.light select option { background: #fff; color: #1a1d21; }
+  body.light thead th { background: #f0f2f5; }
+  body.light .btn-new { color: #fff; }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(200,241,53,0.10), transparent 24%),
+      radial-gradient(circle at top right, rgba(91,196,255,0.08), transparent 22%),
+      linear-gradient(180deg, rgba(255,255,255,0.01), transparent 22%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .app-shell {
+    padding: 24px 32px 40px;
+  }
+
+  .hero-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .hero-copy {
+    padding: 28px 30px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background:
+      linear-gradient(145deg, rgba(200,241,53,0.10), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,0.02), transparent 100%),
+      var(--surface);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    margin-bottom: 14px;
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+    max-width: 12ch;
+    margin-bottom: 14px;
+  }
+
+  .hero-desc {
+    max-width: 64ch;
+    color: var(--text2);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .hero-stat {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent), var(--surface);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.14);
+  }
+
+  .hero-stat-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text3);
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero-stat-value {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+  }
+
+  .hero-stat-note {
+    color: var(--text2);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .status-overview {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .status-card {
+    padding: 14px 14px 12px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    min-width: 0;
+  }
+
+  .status-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .status-card-name {
+    color: var(--text2);
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .status-card-value {
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .status-card-note {
+    color: var(--text3);
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .workspace-panel {
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 28%), var(--surface);
+    box-shadow: 0 26px 60px rgba(0,0,0,0.16);
+    overflow: hidden;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-kicker {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+  }
+
+  .panel-note {
+    color: var(--text2);
+    font-size: 12px;
+    line-height: 1.65;
+    max-width: 58ch;
+  }
+
+  .panel-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .panel-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface2);
+    color: var(--text2);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    color: #0b0d0f;
+    font-size: 16px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .stats-pill {
+    display: flex;
+    gap: 2px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .stat-item {
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }
+
+  .stat-item:not(:last-child) { border-right: 1px solid var(--border); }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  .stat-label { color: var(--text3); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .btn-new {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: #0b0d0f;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-new:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-new:active { transform: translateY(0); }
+
+  .btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .btn-secondary:active { transform: translateY(0); }
+
+  .save-indicator {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(200,241,53,0.24);
+    background: rgba(200,241,53,0.08);
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .save-indicator.error {
+    border-color: rgba(255,95,95,0.3);
+    background: rgba(255,95,95,0.08);
+    color: var(--danger);
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 18px 24px;
+    background: transparent;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toolbar-block.grow {
+    flex: 1 1 260px;
+    min-width: 220px;
+  }
+
+  .toolbar-label {
+    color: var(--text3);
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .search-wrap {
+    position: relative;
+    width: 100%;
+    min-width: 220px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px 8px 32px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: var(--accent); }
+
+  .filter-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .filter-btn:hover { border-color: var(--border2); color: var(--text); }
+  .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0b0d0f;
+    font-weight: 500;
+  }
+
+  .divider { width: 1px; height: 24px; background: var(--border); }
+
+  .view-toggle {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+
+  .view-btn {
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .view-btn.active { background: var(--border); color: var(--text); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    padding: 0 24px 24px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+
+  thead th {
+    background: var(--surface);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    position: relative;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:first-child { border-left: 1px solid var(--border); border-radius: 8px 0 0 0; }
+  thead th:last-child { border-right: 1px solid var(--border); border-radius: 0 8px 0 0; }
+  thead th:hover { color: var(--text); }
+  thead th .sort-icon { margin-left: 4px; opacity: 0.4; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
+  tbody tr {
+    transition: background 0.1s;
+    animation: rowIn 0.3s ease both;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr:hover td { border-color: var(--border2); }
+
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text2);
+    max-width: 220px;
+  }
+  tbody td:first-child { border-left: 1px solid var(--border); }
+  tbody td:last-child { border-right: 1px solid var(--border); }
+
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+
+  .topic-cell {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text);
+    max-width: 280px;
+    min-width: 200px;
+  }
+
+  /* ── CUSTOM SELECTS ── */
+  .cell-select-wrap { position: relative; display: inline-block; }
+
+  .cell-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 4px 22px 4px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    outline: none;
+    color: inherit;
+  }
+  .cell-select:hover, .cell-select:focus {
+    border-color: var(--border2);
+    background: var(--surface2);
+  }
+
+  .select-arrow {
+    position: absolute;
+    right: 6px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 9px;
+    color: var(--text3);
+  }
+
+  /* Type badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: 'Syne', sans-serif;
+    white-space: nowrap;
+  }
+
+  .badge-long { background: rgba(91,196,255,0.12); color: var(--info); border: 1px solid rgba(91,196,255,0.25); }
+  .badge-short { background: rgba(255,123,219,0.12); color: var(--pink); border: 1px solid rgba(255,123,219,0.25); }
+  .badge-carasol { background: rgba(181,123,255,0.12); color: var(--purple); border: 1px solid rgba(181,123,255,0.25); }
+  .badge-empty { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+
+  /* Platform */
+  .platform-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 10px;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  /* Status */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+  .status-research   { background: rgba(91,196,255,0.1); color: var(--status-research); }
+  .status-scripting  { background: rgba(255,179,71,0.1); color: var(--status-scripting); }
+  .status-recorded   { background: rgba(181,123,255,0.1); color: var(--status-recorded); }
+  .status-senttoeditor { background: rgba(255,123,219,0.1); color: var(--status-editor); }
+  .status-edited     { background: rgba(255,95,95,0.1); color: var(--status-edited); }
+  .status-uploaded   { background: rgba(200,241,53,0.1); color: var(--status-uploaded); }
+  .status-reviewed   { background: rgba(127,255,106,0.1); color: var(--status-reviewed); }
+  .status-empty      { background: var(--surface2); color: var(--text3); }
+
+  /* Editable text cell */
+  .editable {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 4px 6px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    width: 100%;
+    min-width: 160px;
+    transition: border-color 0.15s;
+    resize: none;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+  }
+  .editable:hover { border-color: var(--border); }
+  .editable:focus { border-color: var(--accent); background: var(--surface2); white-space: normal; }
+
+  .text-editable {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 4px 6px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    outline: none;
+    width: 100%;
+    min-width: 80px;
+    transition: border-color 0.15s;
+  }
+  .text-editable:hover { border-color: var(--border); }
+  .text-editable:focus { border-color: var(--accent); background: var(--surface2); color: var(--text); }
+
+  /* Date input */
+  input[type="date"].text-editable {
+    color-scheme: dark;
+  }
+
+  /* Row actions */
+  .row-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  tr:hover .row-actions { opacity: 1; }
+
+  .row-btn {
+    width: 24px; height: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text3);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: all 0.12s;
+  }
+  .row-btn:hover { color: var(--danger); border-color: var(--danger); background: rgba(255,95,95,0.08); }
+  .row-btn.dup:hover { color: var(--accent); border-color: var(--accent); background: rgba(200,241,53,0.08); }
+
+  /* Empty state */
+  .empty-row td {
+    text-align: center;
+    padding: 60px;
+    color: var(--text3);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--surface2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+    font-size: 13px;
+  }
+
+  /* Add row btn */
+  .add-row-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .add-row-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,241,53,0.04); }
+
+  /* KANBAN ── */
+  .kanban-board {
+    display: flex;
+    gap: 16px;
+    padding: 0 24px 24px;
+    overflow-x: auto;
+    align-items: flex-start;
+    min-height: 280px;
+  }
+
+  .kanban-col {
+    min-width: 220px;
+    max-width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .kanban-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kanban-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .kanban-count {
+    font-size: 10px;
+    color: var(--text3);
+    background: var(--surface2);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  .kanban-cards {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 60px;
+  }
+
+  .kanban-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    animation: rowIn 0.25s ease both;
+  }
+  .kanban-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+  .kanban-card-topic {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .kanban-card-meta {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: min(560px, 90vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(12px);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-close {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 28px; height: 28px;
+    color: var(--text3);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all 0.12s;
+  }
+  .modal-close:hover { color: var(--danger); border-color: var(--danger); }
+
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .modal-field { display: flex; flex-direction: column; gap: 5px; }
+  .modal-field.full { grid-column: 1 / -1; }
+
+  .modal-note {
+    color: var(--text2);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .modal-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+
+  .modal-input, .modal-select, .modal-textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .modal-input:focus, .modal-select:focus, .modal-textarea:focus { border-color: var(--accent); }
+  .modal-select { appearance: none; cursor: pointer; }
+  .modal-textarea { resize: vertical; min-height: 70px; }
+  input[type="date"].modal-input { color-scheme: dark; }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--text2);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .btn-cancel:hover { border-color: var(--border2); color: var(--text); }
+
+  .btn-save {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    color: #0b0d0f;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: opacity 0.12s;
+  }
+  .btn-save:hover { opacity: 0.88; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--accent);
+    z-index: 999;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: all 0.2s;
+    pointer-events: none;
+    box-shadow: 0 18px 35px rgba(0,0,0,0.25);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .hidden { display: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+  select option { background: #1c1f22; color: #e8eaed; }
+
+  /* ── THEME TOGGLE ── */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text2);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--text); }
+
+  body.light .theme-toggle { background: #e8edf3; }
+  body.light .btn-secondary { background: #e8edf3; }
+  body.light .save-indicator {
+    border-color: rgba(90,158,0,0.24);
+    background: rgba(90,158,0,0.08);
+  }
+
+  @media (max-width: 1180px) {
+    .hero-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .status-overview {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    header { padding: 12px 16px; }
+    .app-shell { padding: 16px 16px 28px; }
+    .hero-copy, .hero-stat, .workspace-panel { border-radius: 18px; }
+    .panel-head, .toolbar { padding-left: 16px; padding-right: 16px; }
+    .table-wrap { padding: 0 16px 16px; }
+    .kanban-board { padding: 0 16px 16px; }
+    .stats-pill { display: none; }
+    .save-indicator { display: none; }
+    .hero-grid, .status-overview { grid-template-columns: 1fr 1fr; }
+    .panel-head { flex-direction: column; }
+    .panel-meta { justify-content: flex-start; }
+    .toolbar-block, .toolbar-block.grow { width: 100%; flex: 1 1 100%; }
+    .divider { display: none; }
+  }
+
+  @media (max-width: 520px) {
+    .hero-grid, .status-overview { grid-template-columns: 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .panel-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">W</div>
+    <div>
+      <div class="logo-text">Content Pipeline</div>
+      <div class="logo-sub">WARRIOR STUDIO · TABLE1</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="stats-pills" id="statsBar"></div>
+    <div class="save-indicator" id="saveIndicator">Auto-save on</div>
+    <button class="btn-secondary" onclick="openExportModal()">Save PDF / PNG</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span>
+      <span id="themeLabel">Light Mode</span>
+    </button>
+    <button class="btn-new" onclick="openModal()">
+      <span>+</span> New Entry
+    </button>
+  </div>
+</header>
+
+<main class="app-shell">
+  <section class="hero-panel">
+    <div class="hero-copy">
+      <span class="hero-eyebrow">Warrior Studio Operations</span>
+      <h1 class="hero-title">Content pipeline command center</h1>
+      <p class="hero-desc">
+        Organize ideas, production stages, collaborators, links, and delivery dates in one workspace.
+        Every change saves locally while you work, and exports are ready for client updates or team handoff.
+      </p>
+    </div>
+    <div class="hero-grid" id="heroStats"></div>
+  </section>
+
+  <section class="status-overview" id="statusOverview"></section>
+
+  <section class="workspace-panel">
+    <div class="panel-head">
+      <div class="panel-copy">
+        <span class="panel-kicker">Pipeline Workspace</span>
+        <h2 class="panel-title" id="panelTitle">Pipeline Table</h2>
+        <p class="panel-note" id="panelNote">Track content from research to review with a cleaner operational view.</p>
+      </div>
+      <div class="panel-meta">
+        <span class="panel-chip" id="panelScopeChip">All entries</span>
+        <span class="panel-chip" id="panelViewChip">Table view</span>
+      </div>
+    </div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-block grow">
+    <span class="toolbar-label">Search</span>
+    <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" type="text" placeholder="Search topics, links, collaborators..." id="searchInput" oninput="renderAll()">
+    </div>
+
+  </div>
+  <div class="toolbar-block">
+    <span class="toolbar-label">Status Filter</span>
+    <div class="filter-group" id="statusFilters">
+    <button class="filter-btn active" data-filter="ALL" onclick="setFilter(this,'ALL')">All</button>
+    <button class="filter-btn" data-filter="RESEARCH" onclick="setFilter(this,'RESEARCH')">Research</button>
+    <button class="filter-btn" data-filter="SCRIPTING" onclick="setFilter(this,'SCRIPTING')">Scripting</button>
+    <button class="filter-btn" data-filter="RECORDED" onclick="setFilter(this,'RECORDED')">Recorded</button>
+    <button class="filter-btn" data-filter="SENT TO EDITOR" onclick="setFilter(this,'SENT TO EDITOR')">To Editor</button>
+    <button class="filter-btn" data-filter="EDITED" onclick="setFilter(this,'EDITED')">Edited</button>
+    <button class="filter-btn" data-filter="UPLOADED" onclick="setFilter(this,'UPLOADED')">Uploaded</button>
+    <button class="filter-btn" data-filter="REVIEWED" onclick="setFilter(this,'REVIEWED')">Reviewed</button>
+    </div>
+
+  </div>
+  <div class="divider"></div>
+
+  <div class="toolbar-block">
+    <span class="toolbar-label">View</span>
+    <div class="view-toggle">
+    <button class="view-btn active" id="tableViewBtn" onclick="setView('table')" title="Table View">☰</button>
+    <button class="view-btn" id="kanbanViewBtn" onclick="setView('kanban')" title="Kanban View">▦</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLE VIEW -->
+<div id="tableView" class="table-wrap">
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th onclick="sortBy('topic')">Topic <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('type')">Type <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('platform')">Platform <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('page')">Page <span class="sort-icon">↕</span></th>
+        <th>Collab</th>
+        <th>Description</th>
+        <th onclick="sortBy('status')">Status <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('uploadDate')">Upload Date <span class="sort-icon">↕</span></th>
+        <th>Note</th>
+        <th>Raw Footage</th>
+        <th>Final Video</th>
+        <th style="width:60px;"></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <button class="add-row-btn" onclick="addRow()">+ Add Row</button>
+</div>
+
+<!-- KANBAN VIEW -->
+<div id="kanbanView" class="kanban-board hidden"></div>
+
+  </section>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modalTitle">New Entry</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-grid">
+      <div class="modal-field full">
+        <label class="modal-label">Topic</label>
+        <input class="modal-input" id="mTopic" placeholder="Video topic or title...">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Type</label>
+        <select class="modal-select" id="mType">
+          <option value="">— Select —</option>
+          <option>LONG</option>
+          <option>SHORT</option>
+          <option>CARASOL</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Platform</label>
+        <select class="modal-select" id="mPlatform">
+          <option value="">— Select —</option>
+          <option>INSTAGRAM</option>
+          <option>YOUTUBE</option>
+          <option>TIKTOK</option>
+          <option>TWITTER</option>
+          <option>LINKEDIN</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Page</label>
+        <select class="modal-select" id="mPage">
+          <option value="">— Select —</option>
+          <option>WARRIOR OVERLOADED</option>
+          <option>CASUAL WARRIOR</option>
+          <option>WARRIOR.OV</option>
+          <option>ESPORTS LENS</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Status</label>
+        <select class="modal-select" id="mStatus">
+          <option value="">— Select —</option>
+          <option>RESEARCH</option>
+          <option>SCRIPTING</option>
+          <option>RECORDED</option>
+          <option>SENT TO EDITOR</option>
+          <option>EDITED</option>
+          <option>UPLOADED</option>
+          <option>REVIEWED</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Collab</label>
+        <input class="modal-input" id="mCollab" placeholder="Collaborator name...">
+      </div>
+      <div class="modal-field full">
+        <label class="modal-label">Description</label>
+        <textarea class="modal-textarea" id="mDescription" placeholder="Brief description of the content..."></textarea>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Upload Date</label>
+        <input class="modal-input" type="date" id="mUploadDate">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Note</label>
+        <input class="modal-input" id="mNote" placeholder="Any notes...">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Raw Footage Link</label>
+        <input class="modal-input" id="mRaw" placeholder="Drive / folder link...">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Final Video Link</label>
+        <input class="modal-input" id="mFinal" placeholder="Published URL...">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveModal()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="exportOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span>Save as PDF or PNG</span>
+      <button class="modal-close" onclick="closeExportModal()">✕</button>
+    </div>
+    <div class="modal-grid">
+      <div class="modal-field">
+        <label class="modal-label">Format</label>
+        <select class="modal-select" id="exportFormat">
+          <option value="pdf">PDF report</option>
+          <option value="png">PNG image</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Scope</label>
+        <select class="modal-select" id="exportScope">
+          <option value="filtered">Current filtered rows</option>
+          <option value="all">All rows</option>
+        </select>
+      </div>
+      <div class="modal-field full">
+        <p class="modal-note" id="exportHint">PDF opens a print-ready report. PNG downloads a snapshot image file.</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeExportModal()">Cancel</button>
+      <button class="btn-save" onclick="exportData()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'warrior-content-pipeline-rows-v1';
+const THEME_KEY = 'warrior-theme';
+const ROW_FIELDS = ['topic','type','platform','page','collab','description','status','uploadDate','note','raw','final'];
+let storageAvailable = true;
+let lastSavedAt = '';
+
+const defaultRows = [
+  { id: 1, topic: 'NAMAH PARVATI PATAYE HAR HAR MAHADEV SHAMBHU', type: 'LONG', platform: 'INSTAGRAM', page: '', collab: '', description: '', status: '', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 2, topic: '', type: 'LONG', platform: 'YOUTUBE', page: '', collab: '', description: '', status: 'RESEARCH', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 3, topic: '', type: '', platform: '', page: 'WARRIOR OVERLOADED', collab: '', description: '', status: 'SCRIPTING', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 4, topic: '', type: 'LONG', platform: '', page: 'CASUAL WARRIOR', collab: '', description: '', status: 'RECORDED', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 5, topic: '', type: 'SHORT', platform: '', page: 'WARRIOR.OV', collab: '', description: '', status: 'SENT TO EDITOR', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 6, topic: '', type: 'CARASOL', platform: '', page: 'ESPORTS LENS', collab: '', description: '', status: 'EDITED', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 7, topic: '', type: '', platform: '', page: '', collab: '', description: '', status: 'UPLOADED', uploadDate: '', note: '', raw: '', final: '' },
+  { id: 8, topic: '', type: '', platform: '', page: '', collab: '', description: '', status: 'REVIEWED', uploadDate: '', note: '', raw: '', final: '' },
+];
+
+function readStorage(key) {
+  try {
+    storageAvailable = true;
+    return localStorage.getItem(key);
+  } catch (error) {
+    storageAvailable = false;
+    console.warn('Storage read failed.', error);
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    storageAvailable = true;
+    return true;
+  } catch (error) {
+    storageAvailable = false;
+    console.warn('Storage write failed.', error);
+    return false;
+  }
+}
+
+function createRow(overrides = {}) {
+  return {
+    id: 0,
+    topic: '',
+    type: '',
+    platform: '',
+    page: '',
+    collab: '',
+    description: '',
+    status: '',
+    uploadDate: '',
+    note: '',
+    raw: '',
+    final: '',
+    ...overrides,
+  };
+}
+
+function normalizeRow(row, fallbackId) {
+  const source = row && typeof row === 'object' ? row : {};
+  const normalized = createRow({ id: Number(source.id) || fallbackId });
+  ROW_FIELDS.forEach(field => {
+    normalized[field] = source[field] == null ? '' : String(source[field]);
+  });
+  return normalized;
+}
+
+function cloneDefaultRows() {
+  return defaultRows.map((row, index) => normalizeRow(row, index + 1));
+}
+
+function loadRows() {
+  const raw = readStorage(STORAGE_KEY);
+  if (!raw) return cloneDefaultRows();
+
+  try {
+    const parsed = JSON.parse(raw);
+    const savedRows = Array.isArray(parsed)
+      ? parsed
+      : parsed && Array.isArray(parsed.rows)
+        ? parsed.rows
+        : null;
+
+    if (!savedRows) return cloneDefaultRows();
+
+    lastSavedAt = parsed && !Array.isArray(parsed) && parsed.savedAt ? String(parsed.savedAt) : '';
+    return savedRows.map((row, index) => normalizeRow(row, index + 1));
+  } catch (error) {
+    console.warn('Saved rows were invalid and were reset.', error);
+    return cloneDefaultRows();
+  }
+}
+
+function getNextId(list) {
+  return list.reduce((maxId, row) => Math.max(maxId, Number(row.id) || 0), 0) + 1;
+}
+
+function formatSaveTime(value) {
+  if (!value) return '';
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function setSaveState(message, isError = false) {
+  const indicator = document.getElementById('saveIndicator');
+  if (!indicator) return;
+
+  indicator.textContent = message;
+  indicator.classList.toggle('error', isError);
+}
+
+function syncSaveIndicator() {
+  if (!storageAvailable) {
+    setSaveState('Browser save blocked', true);
+    return;
+  }
+
+  const savedLabel = formatSaveTime(lastSavedAt);
+  setSaveState(savedLabel ? `Saved ${savedLabel}` : 'Auto-save on');
+}
+
+function persistRows() {
+  const savedAt = new Date().toISOString();
+
+  if (writeStorage(STORAGE_KEY, JSON.stringify({ savedAt, rows }))) {
+    lastSavedAt = savedAt;
+    syncSaveIndicator();
+    return true;
+  }
+
+  setSaveState('Browser save blocked', true);
+  return false;
+}
+
+let rows = loadRows();
+let nextId = getNextId(rows);
+let currentFilter = 'ALL';
+let currentView = 'table';
+let sortField = null;
+let sortAsc = true;
+let editingId = null;
+
+// ─── STATUS STYLING ──────────────────────────────────────────────────────────
+const statusMeta = {
+  'RESEARCH':       { cls: 'status-research',      dot: '#5bc4ff' },
+  'SCRIPTING':      { cls: 'status-scripting',     dot: '#ffb347' },
+  'RECORDED':       { cls: 'status-recorded',      dot: '#b57bff' },
+  'SENT TO EDITOR': { cls: 'status-senttoeditor',  dot: '#ff7bdb' },
+  'EDITED':         { cls: 'status-edited',         dot: '#ff5f5f' },
+  'UPLOADED':       { cls: 'status-uploaded',       dot: '#c8f135' },
+  'REVIEWED':       { cls: 'status-reviewed',       dot: '#7fff6a' },
+};
+
+const typeMeta = {
+  'LONG':    'badge-long',
+  'SHORT':   'badge-short',
+  'CARASOL': 'badge-carasol',
+};
+
+const platformIcon = {
+  'INSTAGRAM': '📸',
+  'YOUTUBE':   '▶',
+  'TIKTOK':    '♪',
+  'TWITTER':   '✦',
+  'LINKEDIN':  '🔗',
+};
+
+const PIPELINE_STATUSES = ['RESEARCH','SCRIPTING','RECORDED','SENT TO EDITOR','EDITED','UPLOADED','REVIEWED'];
+
+const EXPORT_COLUMNS = [
+  { key: 'topic', label: 'Topic', width: 260 },
+  { key: 'type', label: 'Type', width: 95 },
+  { key: 'platform', label: 'Platform', width: 120 },
+  { key: 'page', label: 'Page', width: 180 },
+  { key: 'collab', label: 'Collab', width: 120 },
+  { key: 'description', label: 'Description', width: 220 },
+  { key: 'status', label: 'Status', width: 140 },
+  { key: 'uploadDate', label: 'Upload Date', width: 120 },
+  { key: 'note', label: 'Note', width: 160 },
+  { key: 'raw', label: 'Raw Footage', width: 180 },
+  { key: 'final', label: 'Final Video', width: 180 },
+];
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function statusPill(status) {
+  if (!status) return `<span class="status-pill status-empty">—</span>`;
+  const m = statusMeta[status] || {};
+  return `<span class="status-pill ${m.cls || 'status-empty'}">
+    <span class="status-dot" style="background:${m.dot || '#555'}"></span>${escHtml(status)}
+  </span>`;
+}
+
+function typeBadge(type) {
+  if (!type) return `<span class="badge badge-empty">—</span>`;
+  return `<span class="badge ${typeMeta[type] || 'badge-empty'}">${escHtml(type)}</span>`;
+}
+
+function platformBadge(p) {
+  if (!p) return `<span style="color:var(--text3);font-size:11px">—</span>`;
+  return `<span class="platform-badge">${platformIcon[p] || '📡'} ${escHtml(p)}</span>`;
+}
+
+function selectOpts(opts, val) {
+  return opts.map(o => `<option${o===val?' selected':''}>${o}</option>`).join('');
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  return rows.filter(r => {
+    const matchSearch = !q || Object.values(r).some(v => String(v).toLowerCase().includes(q));
+    const matchFilter = currentFilter === 'ALL' || r.status === currentFilter;
+    return matchSearch && matchFilter;
+  });
+}
+
+function getSorted(arr) {
+  if (!sortField) return arr;
+  return [...arr].sort((a,b) => {
+    const av = (a[sortField] || '').toLowerCase();
+    const bv = (b[sortField] || '').toLowerCase();
+    return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+}
+
+function getDoneCount(list = rows) {
+  return list.filter(r => r.status === 'UPLOADED' || r.status === 'REVIEWED').length;
+}
+
+function getActiveCount(list = rows) {
+  return list.filter(r => r.status && r.status !== 'UPLOADED' && r.status !== 'REVIEWED').length;
+}
+
+function getCurrentScopeLabel() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (query) return `Search: ${query}`;
+  if (currentFilter !== 'ALL') return `Status: ${currentFilter}`;
+  return 'All entries';
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function getScopeLabel(scope) {
+  if (scope === 'all') return 'All rows';
+
+  const query = document.getElementById('searchInput').value.trim();
+  if (query) return `Search: ${query}`;
+  if (currentFilter !== 'ALL') return `Status: ${currentFilter}`;
+  return 'Current filtered rows';
+}
+
+function getExportRows(scope) {
+  return getSorted(scope === 'all' ? rows : getFiltered());
+}
+
+function getExportCellValue(row, field) {
+  const value = row[field];
+  return value && String(value).trim() ? String(value) : '—';
+}
+
+function getExportFileName(extension) {
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  return `warrior-content-pipeline-${stamp}.${extension}`;
+}
+
+function updateExportHint() {
+  const format = document.getElementById('exportFormat').value;
+  document.getElementById('exportHint').textContent =
+    format === 'pdf'
+      ? 'PDF opens a print-ready report in a new tab so the user can Save as PDF.'
+      : 'PNG downloads a single image snapshot of the selected rows.';
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const data = getSorted(getFiltered());
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="12">No entries match your filters.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map((r, idx) => `
+    <tr style="animation-delay:${idx * 0.03}s">
+      <td class="topic-cell">
+        <input class="editable" value="${escHtml(r.topic)}"
+          placeholder="Enter topic…"
+          oninput="updateField(${r.id},'topic',this.value)"
+          title="${escHtml(r.topic)}">
+      </td>
+      <td>
+        <div class="cell-select-wrap">
+          ${typeBadge(r.type)}
+          <select class="cell-select" style="position:absolute;inset:0;opacity:0;cursor:pointer"
+            onchange="updateField(${r.id},'type',this.value);renderAll()">
+            <option value="">—</option>
+            ${selectOpts(['LONG','SHORT','CARASOL'], r.type)}
+          </select>
+        </div>
+      </td>
+      <td>
+        <div class="cell-select-wrap">
+          ${platformBadge(r.platform)}
+          <select class="cell-select" style="position:absolute;inset:0;opacity:0;cursor:pointer"
+            onchange="updateField(${r.id},'platform',this.value);renderAll()">
+            <option value="">—</option>
+            ${selectOpts(['INSTAGRAM','YOUTUBE','TIKTOK','TWITTER','LINKEDIN'], r.platform)}
+          </select>
+        </div>
+      </td>
+      <td>
+        <div class="cell-select-wrap">
+          <span style="font-size:11px;color:var(--text2)">${escHtml(r.page) || '<span style="color:var(--text3)">—</span>'}</span>
+          <select class="cell-select" style="position:absolute;inset:0;opacity:0;cursor:pointer"
+            onchange="updateField(${r.id},'page',this.value);renderAll()">
+            <option value="">—</option>
+            ${selectOpts(['WARRIOR OVERLOADED','CASUAL WARRIOR','WARRIOR.OV','ESPORTS LENS'], r.page)}
+          </select>
+        </div>
+      </td>
+      <td><input class="text-editable" value="${escHtml(r.collab)}" placeholder="—" oninput="updateField(${r.id},'collab',this.value)"></td>
+      <td><input class="text-editable" value="${escHtml(r.description)}" placeholder="—" oninput="updateField(${r.id},'description',this.value)" style="min-width:120px"></td>
+      <td>
+        <div class="cell-select-wrap">
+          ${statusPill(r.status)}
+          <select class="cell-select" style="position:absolute;inset:0;opacity:0;cursor:pointer"
+            onchange="updateField(${r.id},'status',this.value);renderAll()">
+            <option value="">—</option>
+            ${selectOpts(['RESEARCH','SCRIPTING','RECORDED','SENT TO EDITOR','EDITED','UPLOADED','REVIEWED'], r.status)}
+          </select>
+        </div>
+      </td>
+      <td><input class="text-editable" type="date" value="${escHtml(r.uploadDate)}" oninput="updateField(${r.id},'uploadDate',this.value)"></td>
+      <td><input class="text-editable" value="${escHtml(r.note)}" placeholder="—" oninput="updateField(${r.id},'note',this.value)"></td>
+      <td>
+        ${r.raw
+          ? `<a href="${escHtml(r.raw)}" target="_blank" style="color:var(--info);font-size:11px;text-decoration:none">↗ Link</a>`
+          : `<input class="text-editable" value="" placeholder="Link…" oninput="updateField(${r.id},'raw',this.value)" style="min-width:70px">`}
+      </td>
+      <td>
+        ${r.final
+          ? `<a href="${escHtml(r.final)}" target="_blank" style="color:var(--accent);font-size:11px;text-decoration:none">↗ Link</a>`
+          : `<input class="text-editable" value="" placeholder="Link…" oninput="updateField(${r.id},'final',this.value)" style="min-width:70px">`}
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="row-btn dup" onclick="duplicateRow(${r.id})" title="Duplicate">⧉</button>
+          <button class="row-btn" onclick="deleteRow(${r.id})" title="Delete">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ─── RENDER KANBAN ────────────────────────────────────────────────────────────
+function renderKanban() {
+  const board = document.getElementById('kanbanView');
+  const data = getFiltered();
+
+  board.innerHTML = PIPELINE_STATUSES.map(s => {
+    const cards = data.filter(r => r.status === s);
+    const m = statusMeta[s];
+    return `
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <span class="kanban-title" style="color:${m.dot}">${s}</span>
+          <span class="kanban-count">${cards.length}</span>
+        </div>
+        <div class="kanban-cards">
+          ${cards.length ? cards.map(r => `
+            <div class="kanban-card" onclick="openEditModal(${r.id})">
+              <div class="kanban-card-topic">${escHtml(r.topic) || '<span style="color:var(--text3);font-style:italic">Untitled</span>'}</div>
+              <div class="kanban-card-meta">
+                ${r.type ? `<span class="badge ${typeMeta[r.type]||'badge-empty'}" style="font-size:9px;padding:2px 6px">${r.type}</span>` : ''}
+                ${r.platform ? `<span class="platform-badge" style="font-size:9px;padding:2px 6px">${platformIcon[r.platform]||''} ${r.platform}</span>` : ''}
+              </div>
+            </div>
+          `).join('') : `<div style="color:var(--text3);font-size:11px;text-align:center;padding:12px">No entries</div>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function renderStats() {
+  const total = rows.length;
+  const visible = getFiltered().length;
+  const uploaded = getDoneCount(rows);
+  const inProgress = getActiveCount(rows);
+  const unassigned = rows.filter(r => !r.status).length;
+  const query = document.getElementById('searchInput').value.trim();
+  const viewLabel = currentView === 'table' ? 'Table view' : 'Kanban view';
+  const scopeLabel = getCurrentScopeLabel();
+  const panelMessage = visible === total
+    ? `${total} entries in the workspace. Use filters, search, or view toggle to focus the team.`
+    : `${visible} visible entries out of ${total}. ${query ? 'Search is active.' : 'A status filter is active.'}`;
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stats-pill">
+      <div class="stat-item"><span class="stat-val">${total}</span><span class="stat-label">Total</span></div>
+      <div class="stat-item"><span class="stat-val">${inProgress}</span><span class="stat-label">Active</span></div>
+      <div class="stat-item"><span class="stat-val">${uploaded}</span><span class="stat-label">Done</span></div>
+    </div>
+  `;
+
+  document.getElementById('heroStats').innerHTML = `
+    <article class="hero-stat">
+      <span class="hero-stat-label">Total Entries</span>
+      <strong class="hero-stat-value">${total}</strong>
+      <p class="hero-stat-note">All ideas, production tasks, and delivered posts currently tracked.</p>
+    </article>
+    <article class="hero-stat">
+      <span class="hero-stat-label">In Progress</span>
+      <strong class="hero-stat-value">${inProgress}</strong>
+      <p class="hero-stat-note">Items actively moving through research, scripting, recording, editing, or QA.</p>
+    </article>
+    <article class="hero-stat">
+      <span class="hero-stat-label">Completed</span>
+      <strong class="hero-stat-value">${uploaded}</strong>
+      <p class="hero-stat-note">Entries already uploaded or reviewed and ready to reference.</p>
+    </article>
+    <article class="hero-stat">
+      <span class="hero-stat-label">Visible Right Now</span>
+      <strong class="hero-stat-value">${visible}</strong>
+      <p class="hero-stat-note">${visible === total ? 'Showing the full workspace.' : `Current scope: ${escHtml(scopeLabel)}.`}</p>
+    </article>
+  `;
+
+  document.getElementById('statusOverview').innerHTML = PIPELINE_STATUSES.map(status => {
+    const count = rows.filter(r => r.status === status).length;
+    const meta = statusMeta[status];
+    return `
+      <article class="status-card">
+        <div class="status-card-top">
+          <span class="status-dot" style="width:10px;height:10px;background:${meta.dot}"></span>
+          <span class="status-card-value">${count}</span>
+        </div>
+        <div class="status-card-name">${escHtml(status)}</div>
+        <div class="status-card-note">${count ? 'Entries currently in this stage.' : 'No entries in this stage yet.'}</div>
+      </article>
+    `;
+  }).join('');
+
+  setText('panelTitle', currentView === 'table' ? 'Pipeline Table' : 'Pipeline Kanban');
+  setText('panelNote', `${panelMessage} ${unassigned ? `${unassigned} still need a status.` : 'Every entry is assigned to a stage.'}`);
+  setText('panelScopeChip', scopeLabel);
+  setText('panelViewChip', viewLabel);
+}
+
+// ─── RENDER ALL ───────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStats();
+  if (currentView === 'table') renderTable();
+  else renderKanban();
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function updateField(id, field, value) {
+  const r = rows.find(r => r.id === id);
+  if (r) {
+    r[field] = value;
+    persistRows();
+  }
+  renderStats();
+  if (currentView === 'kanban') renderKanban();
+}
+
+function addRow() {
+  rows.push(createRow({ id: nextId++ }));
+  persistRows();
+  renderAll();
+  showToast('Row added');
+}
+
+function deleteRow(id) {
+  rows = rows.filter(r => r.id !== id);
+  persistRows();
+  renderAll();
+  showToast('Row deleted');
+}
+
+function duplicateRow(id) {
+  const src = rows.find(r => r.id === id);
+  if (src) {
+    const copy = { ...src, id: nextId++, topic: src.topic ? src.topic + ' (copy)' : '' };
+    const idx = rows.indexOf(src);
+    rows.splice(idx + 1, 0, copy);
+    persistRows();
+    renderAll();
+    showToast('Row duplicated');
+  }
+}
+
+function setFilter(btn, val) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = val;
+  renderAll();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('tableView').classList.toggle('hidden', v !== 'table');
+  document.getElementById('kanbanView').classList.toggle('hidden', v !== 'kanban');
+  document.getElementById('tableViewBtn').classList.toggle('active', v === 'table');
+  document.getElementById('kanbanViewBtn').classList.toggle('active', v === 'kanban');
+  renderAll();
+}
+
+function sortBy(field) {
+  if (sortField === field) sortAsc = !sortAsc;
+  else { sortField = field; sortAsc = true; }
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+  const ths = document.querySelectorAll('thead th');
+  const fields = ['topic','type','platform','page','collab','description','status','uploadDate'];
+  const idx = fields.indexOf(field);
+  if (idx >= 0) ths[idx].classList.add('sorted');
+  renderTable();
+}
+
+function openExportModal() {
+  document.getElementById('exportFormat').value = 'pdf';
+  document.getElementById('exportScope').value = 'filtered';
+  updateExportHint();
+  document.getElementById('exportOverlay').classList.add('open');
+}
+
+function closeExportModal() {
+  document.getElementById('exportOverlay').classList.remove('open');
+}
+
+function buildPdfReport(exportRows, scope) {
+  const generatedAt = new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+  const scopeLabel = getScopeLabel(scope);
+  const tableHead = EXPORT_COLUMNS.map(col => `<th>${escHtml(col.label)}</th>`).join('');
+  const tableBody = exportRows.map(row => `
+    <tr>
+      ${EXPORT_COLUMNS.map(col => `<td>${escHtml(getExportCellValue(row, col.key))}</td>`).join('')}
+    </tr>
+  `).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Content Pipeline Export</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px;
+    color: #111827;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+  }
+  .sheet {
+    border: 1px solid #d1d5db;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .hero {
+    padding: 28px 32px;
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #f9fafb;
+  }
+  .kicker {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #d1d5db;
+    margin-bottom: 10px;
+  }
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: #e5e7eb;
+  }
+  .meta span {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  th, td {
+    border: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 11px;
+    line-height: 1.45;
+    word-break: break-word;
+  }
+  th {
+    background: #f3f4f6;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4b5563;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  @page { size: landscape; margin: 12mm; }
+  @media print {
+    body { padding: 0; }
+    .sheet { border: none; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+  <section class="sheet">
+    <div class="hero">
+      <div class="kicker">Warrior Studio</div>
+      <h1 class="title">Content Pipeline Export</h1>
+      <div class="meta">
+        <span>${escHtml(scopeLabel)}</span>
+        <span>${exportRows.length} rows</span>
+        <span>${escHtml(generatedAt)}</span>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>${tableHead}</tr>
+      </thead>
+      <tbody>${tableBody}</tbody>
+    </table>
+  </section>
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () { window.print(); }, 200);
+    });
+    window.addEventListener('afterprint', function () {
+      window.close();
+    });
+  <\/script>
+</body>
+</html>`;
+}
+
+function exportPdfReport(exportRows, scope) {
+  const popup = window.open('', '_blank', 'width=1280,height=900');
+  if (!popup) {
+    showToast('Allow popups to export PDF');
+    return;
+  }
+
+  popup.document.open();
+  popup.document.write(buildPdfReport(exportRows, scope));
+  popup.document.close();
+  showToast('PDF export opened');
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  const lines = [];
+  const parts = String(text || '—').split('\n');
+
+  parts.forEach(part => {
+    const words = part.trim() ? part.split(/\s+/) : ['—'];
+    let current = '';
+
+    words.forEach(word => {
+      const candidate = current ? `${current} ${word}` : word;
+      if (ctx.measureText(candidate).width <= maxWidth) {
+        current = candidate;
+        return;
+      }
+
+      if (current) lines.push(current);
+
+      if (ctx.measureText(word).width <= maxWidth) {
+        current = word;
+        return;
+      }
+
+      let segment = '';
+      Array.from(word).forEach(char => {
+        const chunk = segment + char;
+        if (ctx.measureText(chunk).width > maxWidth && segment) {
+          lines.push(segment);
+          segment = char;
+        } else {
+          segment = chunk;
+        }
+      });
+      current = segment;
+    });
+
+    if (current) lines.push(current);
+  });
+
+  return lines.length ? lines : ['—'];
+}
+
+function exportPngReport(exportRows, scope) {
+  const margin = 36;
+  const headerHeight = 108;
+  const tableHeaderHeight = 42;
+  const rowLineHeight = 15;
+  const rowPaddingY = 14;
+  const totalWidth = EXPORT_COLUMNS.reduce((sum, col) => sum + col.width, 0);
+  const colors = {
+    bg: getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#0b0d0f',
+    surface: getComputedStyle(document.body).getPropertyValue('--surface').trim() || '#141618',
+    surface2: getComputedStyle(document.body).getPropertyValue('--surface2').trim() || '#1c1f22',
+    border: getComputedStyle(document.body).getPropertyValue('--border').trim() || '#2a2d31',
+    accent: getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#c8f135',
+    text: getComputedStyle(document.body).getPropertyValue('--text').trim() || '#e8eaed',
+    text2: getComputedStyle(document.body).getPropertyValue('--text2').trim() || '#9aa0aa',
+    text3: getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#5c6370',
+  };
+
+  const measureCanvas = document.createElement('canvas');
+  const measureCtx = measureCanvas.getContext('2d');
+  measureCtx.font = '11px "DM Mono", monospace';
+
+  const rowHeights = exportRows.map(row => {
+    let maxLines = 1;
+    EXPORT_COLUMNS.forEach(col => {
+      measureCtx.font = col.key === 'topic' ? '600 12px Arial, sans-serif' : '11px "DM Mono", monospace';
+      const lines = wrapCanvasText(measureCtx, getExportCellValue(row, col.key), col.width - 18);
+      maxLines = Math.max(maxLines, lines.length);
+    });
+    return Math.max(42, rowPaddingY * 2 + (maxLines * rowLineHeight));
+  });
+
+  const totalHeight = margin + headerHeight + 20 + tableHeaderHeight + rowHeights.reduce((sum, height) => sum + height, 0) + 28;
+  const canvas = document.createElement('canvas');
+  canvas.width = margin * 2 + totalWidth;
+  canvas.height = totalHeight;
+
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = colors.bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = colors.surface;
+  ctx.fillRect(margin, margin, totalWidth, headerHeight);
+  ctx.strokeStyle = colors.border;
+  ctx.strokeRect(margin, margin, totalWidth, headerHeight);
+
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(margin, margin, totalWidth, 6);
+
+  ctx.fillStyle = colors.text3;
+  ctx.font = '11px "DM Mono", monospace';
+  ctx.fillText('WARRIOR STUDIO', margin + 18, margin + 32);
+
+  ctx.fillStyle = colors.text;
+  ctx.font = '700 28px Arial, sans-serif';
+  ctx.fillText('Content Pipeline Export', margin + 18, margin + 64);
+
+  ctx.fillStyle = colors.text2;
+  ctx.font = '12px "DM Mono", monospace';
+  ctx.fillText(`Scope: ${getScopeLabel(scope)}`, margin + 18, margin + 88);
+  ctx.fillText(`Rows: ${exportRows.length}`, margin + 260, margin + 88);
+  ctx.fillText(`Generated: ${new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}`, margin + 390, margin + 88);
+
+  let y = margin + headerHeight + 20;
+  let x = margin;
+
+  ctx.font = '10px Arial, sans-serif';
+  ctx.textBaseline = 'top';
+  EXPORT_COLUMNS.forEach(col => {
+    ctx.fillStyle = colors.surface2;
+    ctx.fillRect(x, y, col.width, tableHeaderHeight);
+    ctx.strokeStyle = colors.border;
+    ctx.strokeRect(x, y, col.width, tableHeaderHeight);
+    ctx.fillStyle = colors.text3;
+    ctx.fillText(col.label.toUpperCase(), x + 9, y + 14);
+    x += col.width;
+  });
+
+  y += tableHeaderHeight;
+  exportRows.forEach((row, rowIndex) => {
+    const rowHeight = rowHeights[rowIndex];
+    let cellX = margin;
+
+    EXPORT_COLUMNS.forEach(col => {
+      ctx.font = col.key === 'topic' ? '600 12px Arial, sans-serif' : '11px "DM Mono", monospace';
+      const lines = wrapCanvasText(ctx, getExportCellValue(row, col.key), col.width - 18);
+      ctx.fillStyle = rowIndex % 2 === 0 ? colors.surface : colors.surface2;
+      ctx.fillRect(cellX, y, col.width, rowHeight);
+      ctx.strokeStyle = colors.border;
+      ctx.strokeRect(cellX, y, col.width, rowHeight);
+      ctx.fillStyle = colors.text;
+
+      lines.forEach((line, index) => {
+        ctx.fillText(line, cellX + 9, y + rowPaddingY + (index * rowLineHeight));
+      });
+
+      cellX += col.width;
+    });
+
+    y += rowHeight;
+  });
+
+  canvas.toBlob(blob => {
+    if (!blob) {
+      showToast('PNG export failed');
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = getExportFileName('png');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('PNG downloaded');
+  }, 'image/png');
+}
+
+function exportData() {
+  const format = document.getElementById('exportFormat').value;
+  const scope = document.getElementById('exportScope').value;
+  const exportRows = getExportRows(scope);
+
+  if (!exportRows.length) {
+    showToast('Nothing to export');
+    return;
+  }
+
+  closeExportModal();
+  if (format === 'png') exportPngReport(exportRows, scope);
+  else exportPdfReport(exportRows, scope);
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+function openModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'New Entry';
+  ['mTopic','mCollab','mNote','mRaw','mFinal','mDescription'].forEach(id => document.getElementById(id).value = '');
+  ['mType','mPlatform','mPage','mStatus'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mUploadDate').value = '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function openEditModal(id) {
+  const r = rows.find(r => r.id === id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Entry';
+  document.getElementById('mTopic').value = r.topic;
+  document.getElementById('mType').value = r.type;
+  document.getElementById('mPlatform').value = r.platform;
+  document.getElementById('mPage').value = r.page;
+  document.getElementById('mCollab').value = r.collab;
+  document.getElementById('mDescription').value = r.description;
+  document.getElementById('mStatus').value = r.status;
+  document.getElementById('mUploadDate').value = r.uploadDate;
+  document.getElementById('mNote').value = r.note;
+  document.getElementById('mRaw').value = r.raw;
+  document.getElementById('mFinal').value = r.final;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function saveModal() {
+  const data = {
+    topic: document.getElementById('mTopic').value.trim(),
+    type: document.getElementById('mType').value,
+    platform: document.getElementById('mPlatform').value,
+    page: document.getElementById('mPage').value,
+    collab: document.getElementById('mCollab').value.trim(),
+    description: document.getElementById('mDescription').value.trim(),
+    status: document.getElementById('mStatus').value,
+    uploadDate: document.getElementById('mUploadDate').value,
+    note: document.getElementById('mNote').value.trim(),
+    raw: document.getElementById('mRaw').value.trim(),
+    final: document.getElementById('mFinal').value.trim(),
+  };
+
+  if (editingId !== null) {
+    const r = rows.find(r => r.id === editingId);
+    if (r) Object.assign(r, data);
+    showToast('Entry updated');
+  } else {
+    rows.push(createRow({ id: nextId++, ...data }));
+    showToast('Entry added');
+  }
+
+  persistRows();
+  closeModal();
+  renderAll();
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById('exportOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeExportModal();
+});
+document.getElementById('exportFormat').addEventListener('change', updateExportHint);
+
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeExportModal();
+  }
+});
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ─── THEME TOGGLE ────────────────────────────────────────────────────────────
+let isLight = false;
+function toggleTheme() {
+  isLight = !isLight;
+  document.body.classList.toggle('light', isLight);
+  document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+  document.getElementById('themeLabel').textContent = isLight ? 'Dark Mode' : 'Light Mode';
+  if (!writeStorage(THEME_KEY, isLight ? 'light' : 'dark')) {
+    setSaveState('Browser save blocked', true);
+  }
+}
+
+// Load saved theme
+(function() {
+  const saved = readStorage(THEME_KEY);
+  if (saved === 'light') { isLight = false; toggleTheme(); }
+})();
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+updateExportHint();
+syncSaveIndicator();
+renderAll();
+</script>
+</body>
+</html>
